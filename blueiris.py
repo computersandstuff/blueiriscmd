@@ -23,11 +23,19 @@ def main():
     parser.add_argument('--trigger', action='store', help='Trigger camera', metavar='camera-short-name', default=None)
     parser.add_argument('--ptzbutton', action='store', help='Send PTZ Button Number', metavar='ptz-button-name', default=None)
     parser.add_argument('--ptzcam', action='store', help='Send PTZ Command', metavar='ptz-cam-name', default=None)
+    parser.add_argument('--camera', help='Camera name to enable or disable', default=None)
+    parser.add_argument('--enabled', help='Camera enabled state (false for disabled, true for enabled)', default=None)
 
     args = parser.parse_args()
 
     bi = BlueIris(args.host, args.user, args.password, args.debug)
-
+    
+    if args.camera is not None and args.enabled is not None:
+        # Enable or disable the specified camera
+        camera_name = args.camera
+        enabled = args.enabled
+        bi.enable_disable_camera(camera_name, enabled)
+        
     if args.get_profile:
         print(bi.get_profile())
         sys.exit(0)
@@ -170,6 +178,10 @@ class BlueIris:
 
     def logout(self):
         self.cmd("logout")
+    
+    def enable_disable_camera(self, camera_name, enabled):
+        self.cmd("camconfig", {"camera": camera_name, "enable": enabled})
+
 
 if __name__ == "__main__":
     main()
